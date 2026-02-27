@@ -239,19 +239,21 @@
                 els.typingIndicator.classList.add('flex');
                 scrollToBottom();
 
-                // Mock API Delay
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                const mockResponse = generateMockResponse(text);
-                chat.messages.push({ role: 'ai', content: mockResponse });
-                
-                isGenerating = false;
-                els.typingIndicator.classList.add('hidden');
-                els.typingIndicator.classList.remove('flex');
-                updateSendButtonState();
-                renderMessages();
-                scrollToBottom();
-            }
+                try {
+    const response = await fetch("https://YOUR-RENDER-URL.onrender.com/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: text })
+    });
+
+    const data = await response.json();
+    chat.messages.push({ role: 'ai', content: data.reply });
+
+} catch (error) {
+    chat.messages.push({ role: 'ai', content: "⚠️ AI connection error." });
+}
 
             function scrollToBottom() {
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
